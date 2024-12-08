@@ -60,32 +60,6 @@ app.get("/detallePedidos",(req, res)=>{
     })
 });
 
-
-app.get("/usuario/:usuario/:contrasenia",(req,res)=>{
-    const {usuario,contrasenia}=req.params;
-    const query=`select *from usuario where usuario='${usuario}'`;
-    connection.query(query,(err,resultado)=>{
-        
-        if(err) {
-            throw err;
-        }
-
-        if(resultado.length === 0)
-        {
-            res.send("usuario no encontrado");
-        }
-        else{
-
-            if(resultado[0].contrasenia===contrasenia)
-            {
-                res.send(true);//autenticado
-            }
-            else{
-                res.send(false);
-            }
-        }
-    });
-});
 /*INSERTAR DATOS */
 
 app.post("/insertar/sabor",(req,res)=>{
