@@ -29,7 +29,7 @@ CREATE TABLE carrito(
     total DOUBLE NOT NULL,
     nit_cliente VARCHAR(13) NOT NULL,
     estado BOOLEAN NOT NULL,
-    FOREIGN KEY(nit_cliente) REFERENCES cliente(nit)
+    FOREIGN KEY(nit_cliente) REFERENCES cliente(nit) ON DELETE CASCADE
 );
 
 CREATE TABLE carrito_productos(
@@ -39,8 +39,8 @@ CREATE TABLE carrito_productos(
     cantidad INT NOT NULL,
     precio DOUBLE NOT NULL,
     estado BOOLEAN NOT NULL,
-    FOREIGN KEY(id_carrito) REFERENCES carrito(id),
-    FOREIGN KEY(id_producto) REFERENCES producto(id)
+    FOREIGN KEY(id_carrito) REFERENCES carrito(id) ON DELETE CASCADE,
+    FOREIGN KEY(id_producto) REFERENCES producto(id) ON DELETE CASCADE
 );
 
 

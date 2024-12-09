@@ -127,6 +127,16 @@ app.get("/productos", (req, res) => {
     });
 });
 
+
+app.get("/productos/:id", (req, res) => {
+    const { id } = req.params;
+    const query = `SELECT * FROM producto WHERE id = ${id}`;
+    connection.query(query, (err, resultado) => {
+        if (err) throw err;
+        res.send(resultado);
+    });
+});
+
 app.post("/insertar/producto", (req, res) => {
     const { nombre, descripcion, costo, existencias, estado } = req.body;
     const query = `INSERT INTO producto (nombre, descripcion, costo, existencias, estado) 
@@ -162,6 +172,21 @@ app.delete("/eliminar/producto/:id", (req, res) => {
 /* Rutas para carrito */
 app.get("/carritos", (req, res) => {
     const query = "SELECT * FROM carrito";
+    connection.query(query, (err, resultado) => {
+        if (err) throw err;
+        res.send(resultado);
+    });
+});
+
+app.get("/carrito/:idCarrito/:nit", (req, res) => {
+    const { idCarrito, nit } = req.params;
+    const query = `
+    SELECT p.nombre, p.descripcion, c.cantidad, c.precio, (c.cantidad * c.precio) as subtotal
+    FROM producto p
+    INNER JOIN carrito_productos c ON p.id = c.id_producto
+    INNER JOIN carrito ca ON ca.id = c.id_carrito
+    WHERE ca.nit_cliente = ${nit} AND c.id_carrito = ${idCarrito};
+    `;
     connection.query(query, (err, resultado) => {
         if (err) throw err;
         res.send(resultado);
@@ -208,13 +233,13 @@ app.get("/carrito_productos", (req, res) => {
     });
 });
 
-app.post("/insertar/carrito_producto", (req, res) => {
+app.post("/carrito/agregar", (req, res) => {
     const { id_carrito, id_producto, cantidad, precio, estado } = req.body;
     const query = `INSERT INTO carrito_productos (id_carrito, id_producto, cantidad, precio, estado) 
                    VALUES ('${id_carrito}', '${id_producto}', '${cantidad}', '${precio}', '${estado}')`;
     connection.query(query, (err, result) => {
         if (err) res.status(500).send("Error al insertar carrito_productos: " + err);
-        else res.send("Carrito_producto insertado correctamente");
+        else res.send("Se ha agregado el producto al carrito");
     });
 });
 
@@ -231,12 +256,21 @@ app.put("/actualizar/carrito_producto/:id", (req, res) => {
     });
 });
 
-app.delete("/eliminar/carrito_producto/:id", (req, res) => {
+app.delete("/carrito/eliminar/:id", (req, res) => {
     const { id } = req.params;
     const query = `DELETE FROM carrito_productos WHERE id=${id}`;
     connection.query(query, (err, result) => {
         if (err) res.send(err);
-        else res.send("Carrito_producto eliminado correctamente");
+        else res.send("Producto eliminado del carrito correctamente");
+    });
+});
+
+app.delete("/carrito/vaciar/:id", (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM carrito_productos WHERE id=${id}`;
+    connection.query(query, (err, result) => {
+        if (err) res.send(err);
+        else res.send("Se ha vaciado el carrito correctamente");
     });
 });
 
